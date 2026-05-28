@@ -58,12 +58,40 @@ for zonesParCapteur in zonesCouvertesParCapteurs:
 coveredZones = np.array(coveredZones)
 
 
-############# Construction de chacune des solutions
-
+############# Construction de chacune des solutions valides
+conbinaisonCapteursValides = []
 for i in range (2**nbrCapteurs):
     solution = []
-    binarySolver = f"{i:0{nbrCapteurs}b}"
-    for i in range(nbrCapteurs):
-        if binarySolver[i]==1:
-            solution.append(coveredZones[i])
-    print(solution)
+    """
+    Phase de récupération de toutes les combinaisons de capteurs 
+    """
+    capteursChecked = []
+    binarySolver = f"{i:0{nbrCapteurs}b}"[::-1]
+    for j in range(nbrCapteurs):
+        valueChecked = binarySolver[j]
+        if binarySolver[j]=='1':
+            solution.append(coveredZones[j])
+            capteursChecked.append(j)
+
+
+
+    # initialisation d'un tableau rempli de zéros, il représente les zones couvertes par combinaison de capteurs
+    zonesCoveredByCapteur = np.zeros(nbrZones)
+    for sol in solution:
+        zonesCoveredByCapteur += np.array(sol)
+
+
+    isCombinaisonValid = True
+    isElementaire = True
+    # on regarde si une zone n'est pas couverte par la combinaison de capteurs
+    for zone in zonesCoveredByCapteur:
+        if zone == 0:
+            isCombinaisonValid = False
+
+    if isCombinaisonValid:
+        conbinaisonCapteursValides.append(capteursChecked)
+        print(str(capteursChecked)+" : "+str(zonesCoveredByCapteur))
+
+
+
+
