@@ -3,31 +3,35 @@ import re
 import numpy as np
 
 if len(sys.argv)!=2:
-    print("Ajouter le fichier d'entrée")
+    print("Mauvaises entrées, il faut un unique argument : le chemin vers le fichier d'entrée")
+
+############# Récupération des données du fichier
 
 ## Division ouverture du fichier et division du texte par lignes
 fileText = open(sys.argv[1]).read()
 fileTextTable = fileText.split("\n")
 
-nbrCapteurs = fileTextTable[0]
-nbrZones = fileTextTable[1]
+nbrCapteurs = int(fileTextTable[0])
+nbrZones = int(fileTextTable[1])
 dureesDeVie = fileTextTable[2].split(" ")
 
 ## récupération des éléments du 4ᵉ jusqu'au dernier
 zonesCouvertesParCapteurs = fileTextTable[3:]
 
-if len(dureesDeVie) != int(nbrCapteurs):
+if len(dureesDeVie) != nbrCapteurs:
     print("les durées de vie ne correspondent pas au nombre de capteurs")
 
-if len(zonesCouvertesParCapteurs) != int(nbrCapteurs):
+if len(zonesCouvertesParCapteurs) != nbrCapteurs:
     print("Mauvaises données d'entrée, pas assez de lignes pour les données d'entrée")
 
 if all(int(n) <= int(nbrZones) for n in re.findall(r'\d+', fileText)):
     print("Le fichier possède des zones n'ayant pas été indiquées dans la deuxième ligne de l'entrée")
 
 
-coveredZones = []
 
+############# Construction de la matrice permettant de construire les solutions élémentaires
+coveredZones = []
+capteurActuel = 1
 for zonesParCapteur in zonesCouvertesParCapteurs:
     zones = []
     """
@@ -44,11 +48,22 @@ for zonesParCapteur in zonesCouvertesParCapteurs:
     0 0 1
     1 0 1
     """
-    for i in range (int(nbrCapteurs)-1):
+    for i in range (nbrCapteurs-1):
         if str(i+1) not in zonesParCapteur:
             zones.append(0)
         else :
             zones.append(1)
     coveredZones.append(zones)
 
-print(coveredZones)
+coveredZones = np.array(coveredZones)
+
+
+############# Construction de chacune des solutions
+
+for i in range (2**nbrCapteurs):
+    solution = []
+    binarySolver = f"{i:0{nbrCapteurs}b}"
+    for i in range(nbrCapteurs):
+        if binarySolver[i]==1:
+            solution.append(coveredZones[i])
+    print(solution)
