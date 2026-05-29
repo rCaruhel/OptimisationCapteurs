@@ -57,11 +57,10 @@ for zonesParCapteur in zonesCouvertesParCapteurs:
 
 coveredZones = np.array(coveredZones)
 
-
 ############# Construction de chacune des solutions valides
 conbinaisonCapteursValides = []
 for i in range (2**nbrCapteurs):
-    solution = []
+    combinaison = []
     """
     Phase de récupération de toutes les combinaisons de capteurs 
     """
@@ -70,15 +69,15 @@ for i in range (2**nbrCapteurs):
     for j in range(nbrCapteurs):
         valueChecked = binarySolver[j]
         if binarySolver[j]=='1':
-            solution.append(coveredZones[j])
+            combinaison.append(coveredZones[j])
             capteursChecked.append(j)
 
 
 
     # initialisation d'un tableau rempli de zéros, il représente les zones couvertes par combinaison de capteurs
     zonesCoveredByCapteur = np.zeros(nbrZones)
-    for sol in solution:
-        zonesCoveredByCapteur += np.array(sol)
+    for comb in combinaison:
+        zonesCoveredByCapteur += np.array(comb)
 
 
     isCombinaisonValid = True
@@ -90,8 +89,25 @@ for i in range (2**nbrCapteurs):
 
     if isCombinaisonValid:
         conbinaisonCapteursValides.append(capteursChecked)
-        print(str(capteursChecked)+" : "+str(zonesCoveredByCapteur))
 
 
 
+# on trie par longueur croissante
+listes_triees = sorted(conbinaisonCapteursValides, key=len)
+combinaisonsElementaires = []
+
+# parcours et vérification
+for element in listes_triees:
+    ensemble_actuel = set(element)
+
+    # On vérifie si un des éléments déjà gardés est inclus dans l'élément actuel
+    est_contenu = any(set(deja_garde).issubset(ensemble_actuel) for deja_garde in combinaisonsElementaires)
+
+    # Si aucun sous-ensemble n'est trouvé à l'intérieur, on le garde
+    if not est_contenu:
+        combinaisonsElementaires.append(element)
+
+print(combinaisonsElementaires)
+
+### À présent, on possède les combinaisons élémentaires, on les gardera pour la suite de l'exercice
 
